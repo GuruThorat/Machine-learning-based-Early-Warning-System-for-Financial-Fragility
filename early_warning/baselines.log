@@ -1,0 +1,30 @@
+FFI threshold tau = 0.3126 (z-score scale)
+Splits: train 295,060  val 63,220  test 63,240
+
+--- naive: re-using cached baseline_naive.npz ---
+  AUC 0.9457  AP 0.9311  RMSE 0.7340
+
+--- ngboost: re-using cached baseline_ngboost.npz ---
+  AUC 0.9814  AP 0.9762  RMSE 0.4907
+
+--- Baseline 3: Kalman / UnobservedComponents per household (1 fit / hh) ---
+  fitted 500/6,324 hh  (54.0 hh/s,  ETA 1.8 min)
+  fitted 1,000/6,324 hh  (53.8 hh/s,  ETA 1.6 min)
+  fitted 1,500/6,324 hh  (54.0 hh/s,  ETA 1.5 min)
+  fitted 2,000/6,324 hh  (53.6 hh/s,  ETA 1.3 min)
+  fitted 2,500/6,324 hh  (53.8 hh/s,  ETA 1.2 min)
+  fitted 3,000/6,324 hh  (53.6 hh/s,  ETA 1.0 min)
+  fitted 3,500/6,324 hh  (53.6 hh/s,  ETA 0.9 min)
+  fitted 4,000/6,324 hh  (53.6 hh/s,  ETA 0.7 min)
+  fitted 4,500/6,324 hh  (53.6 hh/s,  ETA 0.6 min)
+  fitted 5,000/6,324 hh  (53.7 hh/s,  ETA 0.4 min)
+  fitted 5,500/6,324 hh  (53.6 hh/s,  ETA 0.3 min)
+  fitted 6,000/6,324 hh  (53.6 hh/s,  ETA 0.1 min)
+  Kalman finished in 118.1s  (fallbacks: 64)
+  AUC 0.9531  AP 0.9380  RMSE 0.6267
+
+Wrote /Users/gururaj/Downloads/ID5030 ML project /early_warning/lstm_arrays/baselines_summary.json
+Summary:
+  naive      AUC 0.9457  AP 0.9311  RMSE 0.7340
+  ngboost    AUC 0.9814  AP 0.9762  RMSE 0.4907
+  kalman     AUC 0.9531  AP 0.9380  RMSE 0.6267

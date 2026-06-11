@@ -1,0 +1,35 @@
+{
+  "n_households": 42152,
+  "n_months": 24,
+  "cpi_window_start": "2011-01-01",
+  "cpi_anchor_month": "2012-01-01",
+  "cpi_anchor_value": 117.5,
+  "debt_monthly_interest": 0.02,
+  "initial_savings_fraction": 0.05,
+  "shock_rates": {
+    "medical": {
+      "code": "MI1",
+      "five_year_prevalence": 0.2648016542675825,
+      "monthly_poisson_rate": 0.004413360904459708,
+      "shock_kind": "expense_spike"
+    },
+    "disaster": {
+      "code": "MI2",
+      "five_year_prevalence": 0.07877477306211682,
+      "monthly_poisson_rate": 0.0013129128843686136,
+      "shock_kind": "expense_spike"
+    },
+    "crop_failure": {
+      "code": "MI5",
+      "five_year_prevalence": 0.1583525441452575,
+      "monthly_poisson_rate": 0.0026392090690876254,
+      "shock_kind": "income_drop"
+    }
+  },
+  "income_volatility_summary": {
+    "mean": 0.22132739424705505,
+    "p25": 0.14000000059604645,
+    "p50": 0.23200002312660217,
+    "p75": 0.2800000011920929
+  }
+}

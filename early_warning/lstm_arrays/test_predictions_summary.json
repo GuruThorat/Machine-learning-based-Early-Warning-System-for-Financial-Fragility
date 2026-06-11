@@ -1,0 +1,21 @@
+{
+  "K_MC": 50,
+  "device": "mps",
+  "tier_counts": {
+    "tier_0": 43002,
+    "tier_1": 1009,
+    "tier_2": 19229
+  },
+  "tier_capture_of_positives": {
+    "tier_0_positive_share": 0.0939587775408671,
+    "tier_1_positive_share": 0.01937929400615968,
+    "tier_2_positive_share": 0.8866619284529732
+  },
+  "tier_purity": {
+    "tier_0_purity": 0.04611413422631506,
+    "tier_1_purity": 0.4053518334985134,
+    "tier_2_purity": 0.9731655312288731
+  },
+  "mean_predictive_std_ffi": 0.09393853694200516,
+  "mean_predictive_std_p": 0.013462617993354797
+}

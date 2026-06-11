@@ -1,0 +1,140 @@
+{
+  "history_len": 12,
+  "horizon": 3,
+  "time_features": [
+    "log_income",
+    "log_expense",
+    "log_savings",
+    "log_debt",
+    "debt_ratio_z",
+    "expense_vol_z",
+    "savings_buffer_z",
+    "ffi_t",
+    "cpi_n",
+    "shock_medical",
+    "shock_disaster",
+    "shock_crop"
+  ],
+  "n_time_features": 12,
+  "static_features": [
+    "MHEADAGE",
+    "FHEADAGE",
+    "HHEDUC",
+    "HHEDUCM",
+    "HHEDUCF",
+    "HQ1",
+    "ID11_2.0",
+    "ID11_3.0",
+    "ID11_4.0",
+    "ID11_5.0",
+    "ID11_6.0",
+    "ID11_7.0",
+    "ID11_8.0",
+    "ID11_9.0",
+    "ID11_nan",
+    "ID13_2.0",
+    "ID13_3.0",
+    "ID13_4.0",
+    "ID13_5.0",
+    "ID13_6.0",
+    "ID13_nan",
+    "GROUPS_2.0",
+    "GROUPS_3.0",
+    "GROUPS_4.0",
+    "GROUPS_5.0",
+    "GROUPS_6.0",
+    "GROUPS_7.0",
+    "GROUPS_nan",
+    "URBAN2011_1.0",
+    "URBAN2011_nan",
+    "URBAN4_2011_1.0",
+    "URBAN4_2011_2.0",
+    "URBAN4_2011_3.0",
+    "URBAN4_2011_nan",
+    "METRO_1.0",
+    "METRO_nan",
+    "METRO6_2.0",
+    "METRO6_3.0",
+    "METRO6_4.0",
+    "METRO6_5.0",
+    "METRO6_6.0",
+    "METRO6_nan",
+    "HQWALL_1.0",
+    "HQWALL_nan",
+    "HQROOF_1.0",
+    "HQROOF_nan",
+    "HQFLOOR_1.0",
+    "HQFLOOR_nan",
+    "WATER_1.0",
+    "WATER_nan",
+    "SATOILET_1.0",
+    "SATOILET_nan",
+    "SAKITCHEN_1.0",
+    "SAKITCHEN_nan",
+    "FU1_1.0",
+    "FU1_nan",
+    "FULPG_1.0",
+    "FULPG_nan",
+    "MG1_1.0",
+    "MG1_nan"
+  ],
+  "n_static_features": 60,
+  "scalers": {
+    "log_income": {
+      "mean": 8.586538255877342,
+      "std": 1.5109406212882917
+    },
+    "log_expense": {
+      "mean": 8.922255976548229,
+      "std": 0.7630718961754135
+    },
+    "log_savings": {
+      "mean": 4.3379292488098145,
+      "std": 5.071099758148193
+    },
+    "log_debt": {
+      "mean": 7.628138065338135,
+      "std": 5.031415939331055
+    },
+    "debt_ratio_z": {
+      "mean": -0.003573625625427075,
+      "std": 0.9855906364721212
+    },
+    "expense_vol_z": {
+      "mean": 0.0014829494634438854,
+      "std": 0.9746317901664526
+    },
+    "savings_buffer_z": {
+      "mean": -0.001613938297645438,
+      "std": 0.9927865260176791
+    },
+    "ffi_t": {
+      "mean": -0.0028556690547093967,
+      "std": 0.587571706420824
+    },
+    "cpi_n": {
+      "mean": -2.6015275500863116e-15,
+      "std": 1.0000002118283013
+    },
+    "shock_medical": {
+      "mean": 0.0,
+      "std": 1.0
+    },
+    "shock_disaster": {
+      "mean": 0.0,
+      "std": 1.0
+    },
+    "shock_crop": {
+      "mean": 0.0,
+      "std": 1.0
+    }
+  },
+  "split": {
+    "n_train_hh": 29506,
+    "n_val_hh": 6322,
+    "n_test_hh": 6324,
+    "n_train_rows": 295060,
+    "n_val_rows": 63220,
+    "n_test_rows": 63240
+  }
+}

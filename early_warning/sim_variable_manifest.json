@@ -1,0 +1,20 @@
+{
+  "anchor_vars": {
+    "annual_income":      "INCOME",
+    "annual_consumption": "COTOTAL",
+    "assets_stock":       "ASSETS",
+    "debt_hh":            "DB5",
+    "debt_shopkeeper":    "DB6A",
+    "n_persons":          "NPERSONS",
+    "urban":              "URBAN2011"
+  },
+  "earner_count_vars": ["NWKNONAG", "NWKAGLAB", "NWKSALARY", "NWKBUSINESS", "NWKFARM"],
+  "composition_vars":  ["NPERSONS", "NCHILDM", "NCHILDF", "NMARRIEDM", "NMARRIEDF"],
+  "shock_vars": {
+    "medical":     {"code": "MI1", "label": "Major illness/Accidents - large expenditure/loss", "horizon_years": 5, "shock_kind": "expense_spike"},
+    "disaster":    {"code": "MI2", "label": "Drought/Flood/Fire - large expenditure/loss",       "horizon_years": 5, "shock_kind": "expense_spike"},
+    "crop_failure":{"code": "MI5", "label": "Crop Failure - large expenditure/loss",             "horizon_years": 5, "shock_kind": "income_drop"}
+  },
+  "debt_vars": ["DB5", "DB6", "DB6A", "DB1C", "DB2C"],
+  "note": "Curated by scratch/inspect_ihds_for_sim.py. The shock variables are IHDS-II MI-module retrospective 'large expenditure/loss' indicators with a 5-year recall window; the simulator converts the prevalence of each into a monthly Poisson rate (prevalence / 60) for shock injection."
+}

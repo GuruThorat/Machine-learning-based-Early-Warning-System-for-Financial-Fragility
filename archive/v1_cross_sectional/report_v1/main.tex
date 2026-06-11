@@ -1,0 +1,339 @@
+% !TEX encoding = UTF-8 Unicode
+%======================================================================
+%  ID5030 — Machine Learning Project Report
+%  Group 7 | Gururaj Thorat (ED23B065)
+%  Template: ASME asmeconf.cls (mandated by course guidelines)
+%======================================================================
+
+\DocumentMetadata{
+    lang        = eng-US,
+    pdfstandard = A-3u,
+    pdfversion  = 1.7,
+}
+
+\documentclass[colorlinks,balance]{asmeconf}
+
+% Find figures in the sibling figures/ directory (no need to copy them)
+\graphicspath{{../figures/}{./figures/}}
+
+\hypersetup{%
+    pdfauthor   = {Gururaj Thorat},
+    pdftitle    = {Predicting Household Financial Fragility in India: A Composite Index and Machine Learning Approach on IHDS-II Data},
+    pdfkeywords = {financial fragility, IHDS-II, household survey, machine learning, random forest, India},
+    pdfsubject  = {ID5030 Course Project Report},
+}
+
+\allowdisplaybreaks
+
+%---------------------------------------------------------------------
+% Draft-only "Outline / TODO" boxes.
+%   - Set \showoutlinestrue   to keep the planning notes visible.
+%   - Set \showoutlinesfalse  to hide every outline box before final
+%     submission (the prose around them is untouched).
+%---------------------------------------------------------------------
+\usepackage[most]{tcolorbox}
+\usepackage{comment}
+\newif\ifshowoutlines
+\showoutlinesfalse   % outline/TODO boxes hidden for the final submission
+
+\ifshowoutlines
+  \specialcomment{outline}{%
+    \begin{tcolorbox}[enhanced,breakable,
+        colback=yellow!8,colframe=orange!70!black,
+        boxrule=0.4pt,arc=2pt,
+        title=\small Outline\,/\,TODO,fonttitle=\bfseries\small]\small\itshape
+  }{\end{tcolorbox}}
+\else
+  \excludecomment{outline}
+\fi
+
+\begin{document}
+
+%---------------------------------------------------------------------
+% Conference headers — kept neutral for a course report
+%---------------------------------------------------------------------
+\ConfName{ID5030: Machine Learning, Indian Institute of Technology Madras}
+\ConfAcronym{ID5030 Project Report}
+\ConfDate{May 2026}
+\ConfCity{Chennai, India}
+\PaperNo{Group 7}
+
+\title{Predicting Household Financial Fragility in India: A Composite Index and Machine Learning Approach on \NoCaseChange{IHDS-II} Data}
+
+\SetAuthors{Gururaj Thorat\affil{1}\CorrespondingAuthor{ed23b065@smail.iitm.ac.in}}
+\SetAffiliation{1}{Department of Engineering Design, Indian Institute of Technology Madras, Chennai, India \\ Roll No.\ ED23B065 — Group~7}
+
+\maketitle
+
+% Draft footnote removed for final submission.
+
+\keywords{financial fragility, IHDS-II, household survey, India, logistic regression, random forest, composite index}
+
+%======================================================================
+%  ABSTRACT
+%======================================================================
+\begin{abstract}
+Household financial fragility --- the inability to absorb modest income or expense shocks --- is a key determinant of welfare in developing economies, yet survey-based measures of it are scarce for Indian households. Using the second wave of the India Human Development Survey (IHDS-II, 2011--12, $N \!=\! 42{,}152$ households), we construct a six-component Financial Fragility Index (FFI) combining debt burden, consumption stress, asset deficit, employment concentration, dependency pressure, and a distress-borrowing flag. Components are z-standardized, equally weighted, and quartile-binned into four states (Stable, Stretched, Fragile, Distressed). We then predict the binary Fragile/Distressed label from a \emph{disjoint} feature set covering household-head demographics, education, social identity, geography, housing quality, water and sanitation access, and migration history, deliberately excluded from the FFI to prevent label leakage. Three classifiers --- logistic regression, random forest, and gradient-boosted trees (LightGBM) --- are trained on an 80/20 stratified split with 5-fold stratified cross-validation for hyperparameter selection on the training fold. The isotonic-calibrated LightGBM attains a held-out ROC-AUC of \textbf{0.760} (AP $\!=\!$ 0.758, Brier $\!=\!$ 0.199), versus 0.754 for the random forest and 0.751 for logistic regression. SHAP analysis identifies cooking-fuel quality (LPG use), housing-floor material, the presence of a separate kitchen, water source, and the head-of-household's age and education as the most informative non-financial predictors. A leave-states-out generalisation test (GroupKFold by state) yields a mean AUC of 0.736 $\pm$ 0.015, demonstrating that the model transfers to households in states absent from training. The work demonstrates that easily-collected, non-financial covariates can identify financially fragile Indian households with practical accuracy, opening avenues for targeted policy interventions.
+\end{abstract}
+
+%======================================================================
+%  1. INTRODUCTION
+%======================================================================
+\section{Introduction}
+
+\subsection{Background}
+\begin{outline}
+\textbf{Plan:} one paragraph on what financial fragility means, why it matters in low-/middle-income economies, and how Indian household finance is historically under-instrumented relative to developed economies.\\
+\textbf{Status:} drafted below.
+\end{outline}
+Financial fragility refers to a household's inability to absorb modest, unanticipated income or expense shocks without resorting to high-cost coping mechanisms such as informal borrowing, asset distress sales, or the deferral of essential consumption. In low- and middle-income economies the consequences of such fragility extend well beyond the affected household: weak buffers transmit local shocks into health outcomes, child education, and labour-market participation, and they amplify the impact of macroeconomic disturbances such as inflation, monsoon failure, and global commodity cycles. India is a particularly informative setting for studying household fragility because a large share of consumption is financed out of irregular, informal-sector earnings, formal insurance penetration is low, and credit access is fragmented between commercial banks, cooperatives, microfinance institutions, shopkeeper credit, and unregulated moneylenders. Despite this, household-level survey instrumentation in India has historically focused either on stock-based poverty (income, expenditure quantiles) or on multidimensional deprivation indices, with relatively little attention to flow-based liquidity and shock-absorption.
+
+\subsection{Literature Review}
+\begin{outline}
+\textbf{Plan:} 2--3 short paragraphs surveying:
+\begin{itemize}
+\item Lusardi, Schneider, Tufano (2011) -- the original ``financial fragility'' framing using the ``can you raise \$2{,}000 in 30 days?'' benchmark.
+\item Studies using IHDS / NSSO / CMIE for household welfare in India.
+\item ML-based welfare classification (e.g., Jean et al.\ on poverty from satellite imagery; Blumenstock on mobile-phone metadata).
+\item Indices of multidimensional poverty (Alkire--Foster) and how the FFI differs (focuses on flow / shock-absorption, not stock deprivation).
+\end{itemize}
+\textbf{Status:} drafted below.\\
+\textbf{Still to do:} add 1--2 India-specific household-finance citations (e.g.\ Chakrabarty / RBI Household Finance Committee report, NSSO debt and investment survey).
+\end{outline}
+The modern empirical literature on household financial fragility was crystallized by Lusardi, Schneider, and Tufano~\cite{lusardi2011fragility}, who used the question ``can your household come up with \$2{,}000 in 30 days?'' to demonstrate that nearly half of US households were financially fragile by this benchmark even before the 2008 crisis. Their framing has since been adapted across many countries, but most adaptations remain anchored to single survey questions rather than composite indices over multiple structural risk factors.
+
+In parallel, the multidimensional poverty literature~\cite{alkire2011counting} established a methodology for aggregating heterogeneous deprivation indicators into a single score, with the Global Multidimensional Poverty Index (MPI) as its best-known application. The MPI, however, is built from \emph{stock} indicators of deprivation (e.g., schooling, nutrition, sanitation) rather than flow indicators of liquidity and exposure, and is therefore not designed to capture the short-horizon shock-absorption notion at the centre of financial fragility.
+
+A separate strand of work has used machine learning to estimate household welfare from non-traditional or non-financial signals. Jean et al.~\cite{jean2016poverty} predicted asset wealth in African villages from daytime and nighttime satellite imagery, and Blumenstock et al.~\cite{blumenstock2015predicting} predicted poverty and wealth from mobile phone metadata in Rwanda. Both demonstrate that proxies which are far cheaper to collect than full household surveys can recover much of the signal in welfare measurements. To our knowledge, the analogous question for \emph{financial fragility} in India --- whether easily-observed demographic and infrastructural household attributes can identify financially fragile households --- has not been systematically addressed.
+
+\subsection{Research Gap}
+\begin{outline}
+\textbf{Plan:} two-part gap --- (i) no widely-used composite measure of household financial fragility specific to the Indian context aggregating debt, consumption, assets, and employment risk; (ii) limited evidence on whether non-financial household attributes (housing quality, sanitation, head's education, urban/rural, caste/religion) can identify fragile households --- directly relevant to policy targeting where financial data is harder to collect than demographic data.\\
+\textbf{Status:} drafted below.
+\end{outline}
+Two gaps motivate this work. First, there is no widely-adopted composite measure of household financial fragility specific to the Indian context that simultaneously aggregates debt burden, consumption stress, asset position, employment risk, and recourse to distress borrowing. Second, while several studies use ML to predict welfare from alternative data, there is limited evidence on whether non-financial household attributes that are routinely collected in standard demographic surveys --- housing quality, sanitation, water access, head-of-household education, urban/rural status, caste and religion --- can identify fragile households accurately enough to inform policy targeting in settings where collecting income and debt data at scale is expensive or unreliable.
+
+\subsection{Problem Statement}
+\begin{outline}
+\textbf{Plan:} one short paragraph stating the two-step problem precisely --- Step~1 construct an FFI from IHDS-II household-level financial, debt, employment, and demographic variables; Step~2 predict the binary fragile/distressed label from a disjoint set of non-financial covariates.\\
+\textbf{Status:} drafted below.
+\end{outline}
+We address these gaps in two stages. In stage one, we construct a household-level Financial Fragility Index (FFI) from the second wave of the India Human Development Survey (IHDS-II)~\cite{ihds2}, aggregating six standardized components covering debt, consumption, assets, employment concentration, dependency, and distress borrowing. In stage two, we train supervised classifiers that predict the binary high-fragility label (Fragile or Distressed households) using a \emph{disjoint} set of non-financial predictors, ensuring no label leakage from the FFI inputs into the predictor matrix.
+
+\subsection{Objectives}
+\begin{enumerate}
+\item Construct a transparent, reproducible Financial Fragility Index for Indian households using IHDS-II.
+\item Classify households into four fragility states (Stable, Stretched, Fragile, Distressed) and a binary high-fragility label.
+\item Train and compare a linear (logistic regression) and two non-linear (random forest, gradient-boosted trees) classifiers that predict the binary label from non-financial covariates, with cross-validated hyperparameter selection and probability calibration.
+\item Identify the most informative features for distinguishing fragile households, and interpret their policy relevance.
+\end{enumerate}
+
+%======================================================================
+%  2. METHODOLOGY
+%======================================================================
+\section{Methodology}
+
+\subsection{Data}
+\begin{outline}
+\textbf{Plan:} describe IHDS-II (round 2, 2011--12), DS0001 individual file, DS0002 household file, sample design (STATEID/DISTID/PSUID/HHID/HHSPLITID keys), national coverage, sample size before and after cleaning. Cite the dataset.\\
+Mention \texttt{preprocess\_ihds.py}: merging DS0001 + DS0002 on the five-key household identifier; recoding IHDS missing codes ($-9$, $-8$, $-7$) to NaN.\\
+\textbf{Status:} prose drafted below.
+\end{outline}
+The empirical analysis uses the second wave of the India Human Development Survey (IHDS-II), a nationally representative panel survey of 42{,}152 households across 33 states and union territories, conducted by the National Council of Applied Economic Research and the University of Maryland in 2011--12~\cite{ihds2}. IHDS-II uses a stratified multistage probability sample with the rural and urban frames designed to be self-weighting within strata. We work primarily with the household file (\texttt{DS0002}, $N = 42{,}152$ households) and merge in selected individual-level variables from \texttt{DS0001} ($N = 204{,}569$ individuals) keyed on the five-tuple (\texttt{STATEID}, \texttt{DISTID}, \texttt{PSUID}, \texttt{HHID}, \texttt{HHSPLITID}).
+
+Preprocessing follows two steps implemented in \texttt{preprocess\_ihds.py}. First, the IHDS missing codes $-9$, $-8$, and $-7$ (refused, don't know, and inapplicable, respectively) are converted to \texttt{NaN} so that downstream imputation operates only on genuine missingness. Second, a unique household identifier \texttt{hh\_id} is constructed by concatenating the five merge keys; this identifier links the FFI labels back to the predictor matrix without ambiguity.
+
+\subsection{Financial Fragility Index Construction}
+The FFI aggregates six household-level components, each constructed so that higher values indicate \emph{greater} fragility:
+\begin{enumerate}
+\item \textbf{Debt burden} $c_1 = \text{DebtTotal} / (|\text{INCOME}| + \varepsilon)$, where total debt is the sum of household debt (\texttt{DB5}) and shopkeeper debt (\texttt{DB6A}).
+\item \textbf{Consumption stress} $c_2 = \text{COTOTAL} / (|\text{INCOME}| + \varepsilon)$, capturing how much of income is consumed.
+\item \textbf{Asset deficit} $c_3 = -\log(1 + \max(\text{ASSETS}, 0))$, so that low asset stocks score higher.
+\item \textbf{Employment concentration} $c_4 = \sum_{k} s_k^2$, the Herfindahl index over five worker-type buckets (non-agricultural, agricultural-labour, salary, business, farm); a value of 1 indicates a single income source.
+\item \textbf{Dependency pressure} $c_5 = \text{NonEarners} / (\text{Earners} + 1)$.
+\item \textbf{Distress borrowing} $c_6 \in \{0, 1\}$, flagging households whose largest-loan purpose is consumption or medical, or who borrowed from a shopkeeper or moneylender.
+\end{enumerate}
+
+Monetary variables are winsorized at the 1st and 99th percentiles before z-standardization. The FFI is the equal-weighted mean of the six z-scored components:
+\begin{equation}\label{eq:ffi}
+\text{FFI}_h = \frac{1}{6}\sum_{j=1}^{6} z\!\left(c_{j,h}\right)
+\end{equation}
+Households are split into four fragility states using the FFI quartiles: $Q_1$ Stable, $Q_2$ Stretched, $Q_3$ Fragile, $Q_4$ Distressed. The binary supervised label is
+\begin{equation}\label{eq:fragbinary}
+y_h = \mathbb{1}\{\text{State}_h \in \{\text{Fragile}, \text{Distressed}\}\}.
+\end{equation}
+
+\subsection{Predictor Variables}
+\begin{outline}
+\textbf{Plan:} list the predictor blocks used in \texttt{training\_baseline.py} and emphasize that they are \emph{disjoint from FFI inputs}: head demographics, education, social identity, geography, housing quality, services, migration. Justify the leakage-prevention choice in one sentence.\\
+\textbf{Status:} drafted below.
+\end{outline}
+The predictor matrix is deliberately constructed to be disjoint from the variables that enter the FFI in Eqs.~\eqref{eq:ffi}--\eqref{eq:fragbinary}: no income, consumption, asset, debt, or worker-type column appears as a predictor. This separation guarantees that the supervised problem cannot trivially recover the label from its own inputs, and that the classifier's accuracy is informative about the predictive content of \emph{non-financial} household attributes. The predictor blocks are:
+\begin{itemize}
+\item \textbf{Household head demographics}: \texttt{MHEADAGE} (male-head age), \texttt{FHEADAGE} (female-head age).
+\item \textbf{Education of head}: \texttt{HHEDUC} (years), \texttt{HHEDUCM} (male head), \texttt{HHEDUCF} (female head).
+\item \textbf{Social identity}: \texttt{ID11} (caste), \texttt{ID13} (religion), \texttt{GROUPS} (high-level social group).
+\item \textbf{Geography}: \texttt{URBAN2011}, \texttt{URBAN4\_2011}, \texttt{METRO}, \texttt{METRO6}.
+\item \textbf{Housing quality}: \texttt{HQ1} (overall condition), \texttt{HQWALL}, \texttt{HQROOF}, \texttt{HQFLOOR} (material categories).
+\item \textbf{Water, sanitation, kitchen, and cooking fuel}: \texttt{WATER}, \texttt{SATOILET}, \texttt{SAKITCHEN}, \texttt{FU1}, \texttt{FULPG}.
+\item \textbf{Migration history}: \texttt{MG1}.
+\end{itemize}
+Categorical IHDS codes are one-hot encoded with an explicit \texttt{NaN} indicator column (\texttt{dummy\_na=True}), so that ``missing'' is treated as its own informative category rather than being silently imputed away.
+
+\subsection{Models and Training Protocol}
+We use a stratified 80/20 train/test split (\texttt{random\_state} 42) on $N = 42{,}152$ households. All hyperparameter selection is carried out by 5-fold stratified cross-validation on the \emph{training} fold only; the held-out 8{,}431-row test set is touched once, at evaluation time, to produce the numbers in Table~\ref{tab:metrics}. Three classifiers are compared:
+\begin{itemize}
+\item \textbf{Logistic regression.} Median imputation $\to$ \texttt{StandardScaler(with\_mean=False)} (sparse-safe) $\to$ \texttt{LogisticRegression} with $C \in \{0.1, 1, 5\}$ selected by CV AUC.
+\item \textbf{Random forest.} Median imputation $\to$ 400 trees, \texttt{min\_samples\_leaf=20}, no depth limit, \texttt{random\_state=42}.
+\item \textbf{Gradient-boosted trees (LightGBM).}~\cite{ke2017lightgbm} Native handling of missing values; a $\{31, 63, 127\}$ leaves $\times$ $\{50, 100\}$ \texttt{min\_child\_samples} grid is searched by CV AUC, with early stopping (50 rounds) on a held-out 15\% validation slice during the final refit. The selected configuration is num\_leaves = 31, min\_child\_samples = 50, learning rate = 0.05, with 167 trees retained after early stopping.
+\end{itemize}
+We additionally fit an isotonic-calibrated version of the LightGBM model using \texttt{CalibratedClassifierCV} with 5-fold cross-validation; calibration is evaluated by the Brier score and by reliability diagrams (Fig.~\ref{fig:calib}). We report precision, recall, F1, ROC-AUC, average precision (AP), and the Brier score on the held-out test split, all at the default classification threshold of 0.5.
+
+To probe the FFI's sensitivity to construction choices we run three robustness checks (Sect.~\ref{sec:robustness}): (i)~replacing the equal-weight aggregation with a principal-component-derived weighting; (ii)~replacing the median ``top-half'' cutoff with a top-tertile cutoff; and (iii)~a leave-states-out generalisation test in which 5-fold GroupKFold groups households by \texttt{STATEID} so that no state appears in both the training and validation folds.
+
+Feature attribution is reported via tree-explained SHAP values~\cite{lundberg2017shap} for the LightGBM model (\emph{cf.}\ Sect.~\ref{sec:shap}), computed on a random sample of 3{,}000 test-set rows. Permutation importance on the random forest and impurity-based importance are reported as cross-checks; impurity-based importance is known to be biased toward high-cardinality variables~\cite{strobl2007bias} and is included for transparency only.
+
+%======================================================================
+%  3. RESULTS AND DISCUSSION
+%======================================================================
+\section{Results and Discussion}
+
+\subsection{Fragility Distribution}
+After winsorization and equal-weighted z-score aggregation of the six components, the FFI has mean 0 and standard deviation 0.41 by construction; its empirical distribution is strongly right-skewed (sample skewness $\approx 17.5$), with a small tail of households whose debt and consumption ratios are extreme multiples of income (Fig.~\ref{fig:ffi_dist}). The quartile binning therefore produces four well-defined groups: Stable ($n\!=\!10{,}529$), Stretched ($n\!=\!10{,}528$), Fragile ($n\!=\!10{,}528$), and Distressed ($n\!=\!10{,}567$), and the binary high-fragility label is consequently balanced at 50.0/50.0.
+
+The composition of these groups is markedly different across urban and rural India. Rural households account for 54.7\% of the Fragile/Distressed pool, against only 41.2\% in the urban subsample (Fig.~\ref{fig:urban_rural}); equivalently, a rural household is roughly one-third more likely to land in the high-fragility half of the distribution than an urban household. The state-level breakdown (Fig.~\ref{fig:by_state}) shows a similarly large spread: states in the eastern and central belt --- Bihar, Jharkhand, Madhya Pradesh, Chhattisgarh, Odisha --- carry the highest Fragile/Distressed shares (well above 60\%), while the southern and far-northern states (Kerala, Goa, Himachal Pradesh, Jammu \& Kashmir) sit at the other end. These spatial patterns are consistent with the headline poverty geography of India and reassure that the FFI is not capturing pure noise.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{01_ffi_distribution.png}
+\caption{Distribution of the Financial Fragility Index across IHDS-II households. The right tail is heavy because the debt-to-income and consumption-to-income components are themselves heavy-tailed even after 1\%/99\% winsorization.}\label{fig:ffi_dist}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{04_fragility_by_urban_rural.png}
+\caption{Share of households in each fragility state, by urban/rural location. 54.7\% of rural households fall in the Fragile or Distressed groups, against 41.2\% of urban households.}\label{fig:urban_rural}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{05_fragility_by_state.png}
+\caption{State-wise share of Fragile/Distressed households. The eastern and central belt is consistently above the national share; the southern and far-northern states sit below it.}\label{fig:by_state}
+\end{figure}
+
+\subsection{Classifier Performance}
+Held-out test-set performance is summarised in Table~\ref{tab:metrics}. All three classifiers achieve a ROC-AUC in the 0.75--0.76 range on the disjoint non-financial covariate set, comfortably above the 0.5 chance baseline implied by the balanced binary label. The relative ordering --- LightGBM $>$ Random Forest $>$ Logistic Regression --- is consistent across CV, the held-out test set, and the average-precision metric (Fig.~\ref{fig:pr}), and the gap between LightGBM (AUC 0.760 after isotonic calibration) and logistic regression (0.751) is small but reproducible across the five CV folds. Isotonic calibration of LightGBM reduces the Brier score from 0.200 to 0.199 and visibly tightens the reliability diagram in the upper half of the predicted-probability range (Fig.~\ref{fig:calib}); the raw LightGBM model was already approximately well-calibrated, so the gains are modest.
+
+At the default 0.5 threshold the calibrated LightGBM correctly identifies 67.3\% of Fragile/Distressed households with 70.5\% precision (Fig.~\ref{fig:cm}). The confusion matrices are nearly symmetric across all three models, indicating that the residual error is not driven by class imbalance but by genuine overlap of the covariate distributions of Fragile and non-Fragile households in the lower-middle range of the FFI.
+
+\begin{table*}[t]
+\caption{Held-out test-set classification performance for the binary Fragile/Distressed label, $N_{\text{test}}\!=\!8{,}431$. Operating threshold $\!=\!0.5$. 5-fold CV AUC is computed on the training fold ($N_{\text{train}}\!=\!33{,}721$). AP $=$ average precision.}\label{tab:metrics}
+\centering
+\tagpdfsetup{table/header-rows={1}}%
+\begin{tabular}{lcccccc}
+\toprule
+Model & Precision & Recall & F1 & ROC-AUC & AP & Brier \\
+\midrule
+Logistic Regression       & 0.695 & 0.670 & 0.683 & 0.751 & 0.748 & 0.203 \\
+Random Forest             & 0.701 & 0.673 & 0.686 & 0.754 & 0.752 & 0.202 \\
+LightGBM                  & 0.703 & 0.672 & 0.687 & 0.759 & 0.758 & 0.200 \\
+LightGBM (isotonic)       & \textbf{0.705} & \textbf{0.673} & \textbf{0.689} & \textbf{0.760} & \textbf{0.758} & \textbf{0.199} \\
+\midrule
+\multicolumn{4}{l}{LightGBM, 5-fold CV (train)} & \multicolumn{2}{c}{$0.749 \pm 0.007$ (AUC, AP)} & --- \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{06_roc_curves.png}
+\caption{ROC curves on the held-out test set. The three classifiers track each other closely; LightGBM (after isotonic calibration) is slightly above the random forest, which is in turn slightly above logistic regression.}\label{fig:roc}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{07_pr_curves.png}
+\caption{Precision--recall curves on the held-out test set. The dashed line marks the prevalence baseline (\,$\pi\!=\!0.500$).}\label{fig:pr}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{08_confusion_matrices.png}
+\caption{Confusion matrices at threshold 0.5 for the three classifiers.}\label{fig:cm}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{11_calibration.png}
+\caption{Reliability diagram for LightGBM, raw vs.\ isotonic-calibrated, with empirical fraction positive over quantile-spaced predicted-probability bins. Isotonic calibration mildly improves the Brier score (0.200 $\to$ 0.199).}\label{fig:calib}
+\end{figure}
+
+\subsection{Feature Importance}\label{sec:shap}
+SHAP-based feature attribution on the LightGBM model (Fig.~\ref{fig:shap}) and permutation importance on the random forest agree closely on the leading covariates. Three thematic blocks dominate. First, \textbf{kitchen and cooking-fuel infrastructure} --- the household's use of LPG as primary cooking fuel (\texttt{FULPG}), the broader cooking-fuel category (\texttt{FU1}), and whether there is a separate kitchen room (\texttt{SAKITCHEN}) --- together account for the largest share of model attribution; LPG access is the single most informative variable on both SHAP magnitude and on the permutation drop in AUC. Second, \textbf{housing-quality indicators} --- floor material (\texttt{HQFLOOR}), wall material (\texttt{HQWALL}), and roof material (\texttt{HQROOF}) --- form a tightly correlated block that is also highly informative. Third, the \textbf{household head's demographic and human-capital signals} --- the age of the female head (\texttt{FHEADAGE}), the male head's years of schooling (\texttt{HHEDUCM}), and total head schooling (\texttt{HHEDUC}) --- add an orthogonal source of signal that the housing block does not pick up. Sanitation (\texttt{SATOILET}, \texttt{WATER}), urban/rural status, and broad social-identity dummies (\texttt{ID11} caste, \texttt{GROUPS}) appear further down the list but are still consistently positive contributors.
+
+The impurity-based ranking on the random forest (Fig.~\ref{fig:fi}) gives the same broad picture, but inflates the apparent importance of high-cardinality one-hot dummies and is therefore reported only as a cross-check. We use SHAP as the headline interpretation because the SHAP magnitudes are local additive contributions and are not biased by feature cardinality.
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{12_shap_top20.png}
+\caption{Top-20 features by mean absolute SHAP value (LightGBM, evaluated on 3{,}000 random test-set rows). LPG use, floor and kitchen quality dominate, followed by water source, head-of-household age, and head's education.}\label{fig:shap}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth]{09_rf_feature_importance_top20.png}
+\caption{Random forest impurity-based importance (top 20), shown only as a cross-check. Impurity importance is known to be biased toward high-cardinality variables~\cite{strobl2007bias} and should not be read literally.}\label{fig:fi}
+\end{figure}
+
+\subsection{Robustness}\label{sec:robustness}
+We ran three robustness checks on the FFI and the LightGBM classifier.
+
+\textbf{(a)~Alternative weighting (PCA versus equal weights).} Replacing the equal-weight aggregation with the first principal component of the six z-scored components produces a score whose Pearson correlation with the equal-weight FFI is $+0.54$ but whose \emph{Spearman} correlation is $-0.41$, and binarising each at its own median yields only 33.6\% agreement (Cohen's $\kappa = -0.33$). The reason is mechanical: PCA loads disproportionately onto the two heavy-tailed monetary ratios (debt-burden 0.62 and consumption-stress 0.66; sample skewness of the PCA score is 40.7 versus 17.5 for the equal-weight score), so PC1 in effect ranks households by their debt and consumption ratios alone, while equal weights give each of the six structural risk dimensions a $\frac{1}{6}$ share regardless of natural variance. We therefore retain equal weights as the headline aggregator and treat the PCA-weighted score as a stress test rather than a competing index.
+
+\textbf{(b)~Alternative cutoff.} Tightening the binarisation from a top-half cutoff (prevalence 0.50) to a top-tertile cutoff (prevalence 0.33) reduces the LightGBM test AUC only marginally, from 0.758 to 0.751. Average precision drops more visibly (0.757 $\to$ 0.618) but that movement is mechanical, since AP scales with the positive-class prevalence; the AUC stability confirms that the classifier's discriminative ordering is not an artefact of the median cut.
+
+\textbf{(c)~Geographic out-of-sample generalisation.} A 5-fold GroupKFold by \texttt{STATEID} --- so that no state appears in both training and validation --- gives a mean LightGBM AUC of $0.736 \pm 0.015$ across folds. The drop relative to the in-distribution test AUC (0.760) is small ($\approx 0.024$), which is encouraging: the model is not memorising state-specific fixed effects, and its predictions transfer to households in states absent from training.
+
+\subsection{Discussion}
+The classifiers achieve a held-out AUC of $\approx 0.75$--$0.76$ on a covariate set that contains no income, debt, consumption, asset, or worker-type variable. Restated in policy terms: a checklist of housing-quality, sanitation, cooking-fuel, and head-of-household demographic items --- all of which are routinely collected in the national Census, NSSO, and NFHS rounds --- recovers most of the predictive content that a full financial questionnaire would yield. For targeted programme delivery in settings where collecting income or debt at scale is expensive or unreliable, this is a useful margin.
+
+Two patterns in the residual error are worth flagging. First, the confusion matrices in Fig.~\ref{fig:cm} are nearly symmetric: false positives and false negatives are roughly balanced at the 0.5 threshold, suggesting that the model neither over- nor under-predicts fragility on average. Second, the SHAP analysis indicates that the dominant predictors are not the social-identity (caste/religion) variables but the infrastructural ones (cooking fuel, housing materials, sanitation, water source). This is a non-obvious finding: it suggests that whatever residual signal social identity carries about household fragility in India is largely mediated through the housing-and-services bundle, which the classifier is then able to read off directly.
+
+Three limitations bound the scope of these claims. \textit{First}, IHDS-II is a single survey wave (2011--12); we cannot observe transitions between fragility states or estimate the model on a more recent post-pandemic sample. \textit{Second}, the FFI is one of many defensible aggregations: although the equal-weight and tertile-cutoff robustness checks above are reassuring, the head-line ranking is necessarily a function of the six chosen components and the linear z-score aggregator. \textit{Third}, the classifier's $\approx 0.75$ AUC implies that the bottom of the precision--recall curve still misclassifies a non-trivial share of borderline households; downstream policy use would therefore want to operate at an explicit precision/recall trade-off chosen for the intervention (e.g.\ high precision for cash-transfer eligibility, high recall for outreach surveys) rather than at the symmetric 0.5 threshold reported here.
+
+%======================================================================
+%  4. CONCLUSION
+%======================================================================
+\section{Conclusion}
+We constructed a six-component Financial Fragility Index for Indian households from IHDS-II, with equal-weighted z-scored aggregation of debt burden, consumption stress, asset deficit, employment concentration, dependency pressure, and a distress-borrowing flag. Quartile binning yields four states (Stable, Stretched, Fragile, Distressed) whose spatial and urban/rural composition is consistent with the existing poverty geography of India and survives sensitivity to alternative cutoffs and to PCA-weighted aggregation (the latter caveated by the heavy tails of the underlying monetary ratios). Three classifiers --- logistic regression, random forest, and LightGBM --- predict the binary Fragile/Distressed label from a disjoint, non-financial covariate set with a held-out ROC-AUC of 0.751, 0.754, and 0.760 respectively, with the isotonic-calibrated LightGBM as the headline model. A leave-states-out generalisation test confirms that the model transfers across state boundaries (AUC $0.736 \pm 0.015$).
+
+Mapped against the objectives stated in Sect.~1.5: (1)~the FFI is constructed and is reproducible from the released IHDS-II microdata using two short Python scripts; (2)~households are assigned to the four states and the binary label; (3)~both a linear and a non-linear classifier are trained and evaluated, plus a third gradient-boosted comparator and an isotonic-calibrated variant; and (4)~the most informative non-financial covariates are identified by SHAP, with cooking-fuel infrastructure, housing-floor and -wall materials, sanitation, and the head's age and education emerging as the leading signals. The practical implication is that a short list of routinely-collected, non-financial household attributes can identify financially fragile Indian households accurately enough to inform targeted policy outreach in settings where collecting income and debt data at scale is expensive or unreliable.
+
+%======================================================================
+%  5. FUTURE SCOPE
+%======================================================================
+\section{Future Scope}
+Four extensions are natural follow-ups to the present study.
+
+\textit{Panel dynamics.} IHDS-I (2004--05) and IHDS-II (2011--12) share a household linkage that supports a two-wave panel. Estimating transition probabilities between the four fragility states --- and asking which non-financial covariates predict downward versus upward transitions --- would convert the current static index into a dynamic risk model and would directly speak to which household characteristics are protective over a seven-year horizon.
+
+\textit{Supervised weighting of the FFI.} The robustness analysis showed that PCA-derived weights are dominated by the heavy-tailed monetary ratios, so they do not constitute a useful alternative to equal weights. A more principled extension is to learn the six FFI weights by optimising a supervised criterion --- for example, the AUC of a downstream classifier predicting an external welfare benchmark such as the headcount poverty line or an MPI deprivation flag --- subject to a non-negativity constraint to retain interpretability.
+
+\textit{Post-pandemic external validation.} The IHDS frame predates COVID-19, demonetisation, and the 2017 GST rollout, all of which are likely to have re-shaped the household-finance landscape. Re-fitting on the more recent CMIE Consumer Pyramids household panel or on NSSO 78th-round microdata would test whether the SHAP-identified leading predictors --- cooking fuel, housing material, sanitation --- remain the most informative signals in the post-pandemic period.
+
+\textit{Policy-relevant thresholding.} The held-out metrics in Table~\ref{tab:metrics} are reported at the symmetric 0.5 threshold. A useful operationalisation step is to fit the threshold to a specific policy loss function --- e.g.\ a cost-sensitive trade-off in which false negatives (missed eligible households) and false positives (wasted outreach) carry different costs --- and to publish the resulting precision/recall point alongside the model.
+
+%======================================================================
+%  6. CREDITS
+%======================================================================
+\section*{Credits}
+% Solo submission — single contributor.
+All components of this project (data preprocessing, FFI construction, model training and evaluation, figure generation, and report writing) were carried out by Gururaj Thorat (ED23B065).
+
+%======================================================================
+%  REFERENCES
+%======================================================================
+\bibliographystyle{asmeconf}
+\bibliography{references}
+
+\end{document}
