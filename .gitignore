@@ -1,0 +1,85 @@
+# =====================================================================
+# ICPSR / IHDS-II restricted materials — DO NOT redistribute
+# (Terms of Use signed 2026-04-24, ICPSR study 36151)
+# =====================================================================
+DS0001/
+DS0002/
+DS0003/
+DS0004/
+DS0005/
+DS0006/
+DS0007/
+DS0008/
+DS0009/
+DS0010/
+DS0011/
+DS0012/
+DS0013/
+DS0014/
+36151-*
+series-507-*
+TermsOfUse.html
+submission/Group7/data-User_guide.pdf
+submission/Group7/Documentation-Dataguide.pdf
+
+# =====================================================================
+# Derived household-level data (restricted by extension)
+# =====================================================================
+*.parquet
+test_predictions.csv
+early_warning/lstm_arrays/*.npy
+early_warning/lstm_arrays/*.npz
+early_warning/lstm_arrays/*.pt
+
+# =====================================================================
+# Large binaries (over GitHub size limits or just heavy)
+# =====================================================================
+submission/Group7/Group7_PPT_Video.mp4
+submission/Group7.zip
+report.zip
+
+# =====================================================================
+# LaTeX build artifacts
+# =====================================================================
+report/*.aux
+report/*.log
+report/*.bbl
+report/*.blg
+report/*.fdb_latexmk
+report/*.fls
+report/*.synctex.gz
+report/*.out
+report/*.toc
+report/comment.cut
+archive/v1_cross_sectional/report_v1/*.aux
+archive/v1_cross_sectional/report_v1/*.log
+archive/v1_cross_sectional/report_v1/*.bbl
+archive/v1_cross_sectional/report_v1/*.blg
+archive/v1_cross_sectional/report_v1/*.fdb_latexmk
+archive/v1_cross_sectional/report_v1/*.fls
+archive/v1_cross_sectional/report_v1/*.synctex.gz
+archive/v1_cross_sectional/report_v1/*.out
+archive/v1_cross_sectional/report_v1/*.toc
+archive/v1_cross_sectional/report_v1/comment.cut
+submission/_build_supp/
+
+# Third-party / course-staff materials — not ours to redistribute
+ML project submission/
+ID5030_Project_Presentation_and_Report_Guidelines*.pdf
+
+# =====================================================================
+# Python / OS cruft
+# =====================================================================
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.ipynb_checkpoints/
+
+# =====================================================================
+# Editor / tooling state
+# =====================================================================
+.claude/
+.vscode/
+.idea/
+package-lock.json

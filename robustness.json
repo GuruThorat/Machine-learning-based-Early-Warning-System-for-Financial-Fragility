@@ -1,0 +1,59 @@
+{
+  "A_pca_vs_equal_weights": {
+    "pca_explained_variance_ratio": 0.24287103645644922,
+    "pca_loadings_sign_aligned": {
+      "c1_debt_burden": 0.625,
+      "c2_cons_stress": 0.6604,
+      "c3_asset_deficit": -0.1868,
+      "c4_emp_concentration": -0.1726,
+      "c5_dependency": 0.3029,
+      "c6_distress_borrow": -0.1299
+    },
+    "pearson_corr": 0.5430094492047377,
+    "spearman_corr": -0.4124022572502466,
+    "skew_equal_weight_ffi": 17.52172474363664,
+    "skew_pca_ffi": 40.6782530373367,
+    "binary_label_agreement": 0.33575533076886543,
+    "cohens_kappa": -0.32848933846226913,
+    "n_rows_used": 42114
+  },
+  "B_alt_cutoff_lgbm": {
+    "top_half_equal_weights": {
+      "auc": 0.7583724207430458,
+      "ap": 0.7565524092259943,
+      "prevalence": 0.5004507496678686
+    },
+    "top_tertile_equal_weights": {
+      "auc": 0.751455883269417,
+      "ap": 0.6176119291990292,
+      "prevalence": 0.3330328335547542
+    }
+  },
+  "C_geographic_oos_lgbm": {
+    "fold_aucs": [
+      0.7397785510993058,
+      0.7593633907444663,
+      0.7220694308532467,
+      0.716329317066613,
+      0.7425979347623606
+    ],
+    "fold_aps": [
+      0.7361950666250936,
+      0.7812865286635648,
+      0.6624656614810871,
+      0.7227560865191411,
+      0.7644303980664509
+    ],
+    "fold_sizes": [
+      8410,
+      8442,
+      8446,
+      8454,
+      8400
+    ],
+    "auc_mean": 0.7360277249051984,
+    "auc_std": 0.01539253649716982,
+    "ap_mean": 0.7334267482710675,
+    "ap_std": 0.04100923634256371
+  }
+}
