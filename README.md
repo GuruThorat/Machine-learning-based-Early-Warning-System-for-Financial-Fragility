@@ -1,6 +1,5 @@
 # Machine Learning Based Early-Warning System for Financial Fragility
 
-Course project for **ID5030 — Machine Learning** at IIT Madras (Group 7).
 Author: **Gururaj Dinesh Thorat** (ED23B065).
 
 ## What this project does
